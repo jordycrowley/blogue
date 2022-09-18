@@ -1,0 +1,28 @@
+baseURL = "/"
+languageCode = "fr-ca"
+title = "Blogue de Jordan Chénard"
+themesDir = "themes"
+theme = "hugo-winston-theme"
+
+pygmentsCodeFences = true
+pygmentsCodefencesGuessSyntax = true
+pygmentsUseClasses = true
+paginate = 3
+
+[module]
+  [module.hugoVersion]
+    extended = true
+    min = "0.55.0"
+
+[params]
+  google_analytics_id = ""
+  twitter_handle = "@jordanchenard"
+
+  showAuthorOnHomepage = true
+  showAuthorOnPosts = true
+  showPostsOnHomepage = true
+
+  addFrame = true
+  addDot = true
+
+  highlightColor = '#7b16ff'

@@ -1,0 +1,15 @@
+{
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/jordanchenard",
+      "image": "images/social/twitter.svg"
+    },
+
+    {
+      "name": "linkedin",
+      "url": "https://www.linkedin.com",
+      "image": "images/social/linkedin.svg"
+    }
+  ]
+}

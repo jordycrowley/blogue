@@ -21,7 +21,8 @@ La proposition me semble un peu utopique, mais Fenwick McKelvey, professeur agr�
 
 [Les deux spécialistes en profitent pour nous rappeler que CBC/Radio-Canada avait même lancé sa propre plateforme d'hébergement vidéo pour le public en 2002](https://exclaim.ca/music/article/do_i_want_my_zed_tv-cbc_attempts_open_source). Plus de 2 ans avant la naissance de YouTube, en 2005! C'est hallucinant d'imaginer que l'état a déjà eu de l'avance sur les Big Tech [à un certain moment de l'histoire](https://web.archive.org/web/20021210152457/http://zed.cbc.ca/displayContent.do?item_id=7860).
 
-[Canada’s public broadcaster should use Mastodon to provide a social media service](https://theconversation.com/canadas-public-broadcaster-should-use-mastodon-to-provide-a-social-media-service-194116)   Fenwick McKelvey & Robert W. Gehl   
+[Canada’s public broadcaster should use Mastodon to provide a social media service](https://theconversation.com/canadas-public-broadcaster-should-use-mastodon-to-provide-a-social-media-service-194116)  
+Fenwick McKelvey & Robert W. Gehl   
 8 novembre, 2022  
 The Conversation, Academic Journalism Society  
 

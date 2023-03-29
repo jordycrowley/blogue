@@ -26,3 +26,8 @@ paginate = 3
   addDot = true
 
   highlightColor = '#7b16ff'
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true

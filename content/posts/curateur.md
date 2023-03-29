@@ -3,7 +3,7 @@ title: "Curateur (quand le syndrome d'imposteur est trop fort)"
 date: 2023-03-25T15:17:11-04:00
 description: 'Plusieurs se demande où je trouve toute les informations ou les explications à toutes mes questions. Je vous donne quelques playlists que je mettrai à jour.'
 image: images/impostor_at_night.gif
-draft: True
+draft: false
 ---
 
 Plusieurs se demandent où je trouve toutes les informations ou les explications à toutes mes questions. Je vous donne quelques playlists que je mettrai à jour.

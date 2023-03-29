@@ -1,7 +1,7 @@
 ---
 title: "Curateur (quand le syndrome d'imposteur est trop fort)"
 date: 2023-03-28
-description: 'Je viens de créer quelques playlist YouTube pour les Curieux de... touttt!'
+description: 'Je viens de créer quelques playlists YouTube pour les Curieux de... touttt!'
 image: images/impostor_at_night.gif
 draft: false
 ---

@@ -8,8 +8,14 @@
 
     {
       "name": "linkedin",
-      "url": "https://www.linkedin.com",
+      "url": "https://www.linkedin.com/in/jordanchenard/",
       "image": "images/social/linkedin.svg"
+    },
+
+    {
+      "name": "youtube",
+      "url": "https://www.youtube.com/@jordanchenard",
+      "image": "images/social/youtube.svg"
     }
   ]
 }

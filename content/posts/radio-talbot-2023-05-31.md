@@ -61,7 +61,6 @@ _**CNBC**_ <br />
 *Productrice supervisante : Jeniece Pettitt*<br />
 *Caméra supplémentaire : Andrew Evers, Sydney Boyo*<br />
 
-_**À propos de CNBC :**_ *De Wall Street à Main Street, en passant par des documentaires primés et des séries de télé-réalité, CNBC vous offre une couverture complète. Profitez de premières exclusives de vos émissions préférées, de vidéos exclusives et bien plus encore.*</small>
 
 ---
 ---

@@ -6,7 +6,7 @@ image:
 draft: false
 ---
 
-# Évaluer nos pistes de réflexion
+# Évaluer nos pistes de réflexion 
 
 Une même question peut avoir plusieurs réponses potentielles. Par exemple, observer un objet que l'on ne reconnaît pas dans le ciel : cela pourrait être un avion, un oiseau ou Superman.
 

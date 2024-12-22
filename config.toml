@@ -16,7 +16,7 @@ paginate = 3
 
 [params]
   google_analytics_id = ""
-  twitter_handle = "@jordanchenard"
+  twitter_handle = "https://bsky.app/profile/jordanchenard.ca"
 
   showAuthorOnHomepage = true
   showAuthorOnPosts = true

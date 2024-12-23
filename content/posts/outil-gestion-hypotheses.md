@@ -28,570 +28,868 @@ Avec cet outil, l’idée est simple : **rassembler vos hypothèses, leur donner
 
 1. **Posez votre question centrale** : Vous vous demandez "Pourquoi les chats dorment autant ?" Écrivez la question dans le champ prévu pour ça.
 
-2. **Ajoutez vos hypothèses** : Pour chaque hypothèse, attribuez un pourcentage (genre "70% pour parce qu’ils sont paresseux", "20% pour économiser de l’énergie", etc.).
+2. **Ajoutez vos hypothèses** : Pour chaque hypothèse, attribuez un pourcentage (genre 70% pour "parce qu’ils sont paresseux", 20% à l'hypothèse que c'est "pour économiser de l’énergie", etc.).
 
 3. **Admirez votre tableau** : Chaque hypothèse a sa couleur et sa petite ligne qui la relie à une jolie barre verticale, qui permet de voir l'importance de chaque hypothèse face aux autres.
 
-4. **Ajustez, jouez, testez** : Vous changez un pourcentage, vous enlevez une hypothèse, et hop, tout se réorganise en temps réel. C’est fluide, c’est l'fun.
+4. **Ajustez, jouez, testez** : Parfois, on se rend compte qu'une hypothèse a trop d'importance quand on la voit à côté d'autres plus crédibles. C'est là que vous pouvez modifier un pourcentage ou enlever une hypothèse, et hop, tout se réorganise en temps réel.
+
+5. **Verouiller un pourcentage** : Vous avez une ou des hypothèses que vous voulez les voir conserver un certain pourcentage, vous pouvez verouiller celui-ci. Les autres hypothèses s'ajusteront, mais celles verrouillées ne bougeront pas. Vous pouvez verrouiller plusieurs hypothèses, mais le total ne doit pas dépasser 100% (exemple: A-80%, B-45%... Vous verrez un message d'erreur demandant de modifier ces pointages). 
 
 5. **Je ne garde aucune trace de ce que vous faites** : L'outil fonctionne localement sur la page Web et n'envoie aucune donnée nulle part.
 
+On s'entend, c'est littéralement construit avec de la colle en bâton et du *duck tape*. Donc, soyez indulgents. Surtout, amusez-vous!
+
+
 ## Alors, c’est quoi la grande question que vous allez explorer aujourd’hui ? 
 
-
-
-<div id="hypothesis-tool">
-    <h2 id="question-subtitle" class="hidden"></h2> 
-    
- <div id="question-form">
-        <input type="text" id="question-input" placeholder="Entrez une question">
-        <button id="set-question-button">Définir la Question</button>
-    </div>
-    
- <div id="hypothesis-form">
-        <input type="text" id="hypothesis-input" placeholder="Entrez une hypothèse">
-        <input type="number" id="percentage-input" placeholder="Pourcentage" min="0" max="100">
-        <button id="add-button">Ajouter</button>
-    </div>
-    
-  <div id="hypotheses-container">
-    <svg id="connections-svg"></svg>
-   <div id="hypotheses-list"></div>
-        <div id="percentage-bar-vertical">
-            <div id="bar-segments"></div>
-        </div>
-    </div>
-</div>
-
-
 <style>
-    #hypothesis-tool {
-        max-width: 800px;
-        margin: 0 auto; /* Centrer l'outil sur la page */
-        padding: 20px;
-        background-color: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        position: relative; /* Pour positionner le SVG correctement */
-    }
+  /**********************************************/
+  /*                STYLE GÉNÉRAL               */
+  /**********************************************/
 
-    #question-form,
-    #hypothesis-form {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        justify-content: center;
-        flex-wrap: wrap; /* Permettre le retour à la ligne sur petits écrans */
-    }
+  #hypothesis-tool {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
 
-    #question-form input[type="text"],
-    #hypothesis-form input[type="text"],
-    #hypothesis-form input[type="number"] {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
+  #hypothesis-tool h2,
+  #hypothesis-tool h3 {
+    text-align: center;
+  }
 
-    #question-form input[type="text"],
-    #hypothesis-form input[type="text"] {
-        flex: 1 1 300px; /* Flex-grow, Flex-shrink, Flex-basis */
-        min-width: 200px;
-    }
+  .row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
 
-    #hypothesis-form input[type="number"] {
-        width: 100px;
-    }
+  .row input[type="text"],
+  .row input[type="number"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
 
-    #set-question-button,
-    #add-button {
-        padding: 8px 16px;
-        background-color: #3498db;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        flex: 0 0 auto;
-    }
+  .btn {
+    padding: 8px 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
 
-    #set-question-button:hover,
-    #add-button:hover {
-        background-color: #2980b9;
-    }
+  .btn:hover {
+    background-color: #2980b9;
+  }
 
+  #question-subtitle {
+    margin-bottom: 2rem;
+    font-size: 1.2rem;
+  }
+
+  /**********************************************/
+  /*              LISTE D’HYPOTHÈSES            */
+  /**********************************************/
+
+  #hypotheses-container {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    position: relative;
+    margin-top: 1rem;
+  }
+
+  #hypotheses-list {
+    flex: 1 1 400px;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column; /* Ordre décroissant du haut vers le bas */
+    position: relative;
+    z-index: 2;
+  }
+
+  .hypothesis-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-left: 10px solid #000; /* Couleur dynamique */
+    border-radius: 5px;
+    background-color: #fff;
+    transition: background-color 0.3s;
+    animation: fadeIn 0.5s ease-in-out;
+    position: relative;
+  }
+
+  .hypothesis-item:hover {
+    background-color: #f9f9f9;
+  }
+
+  .hypothesis-details {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-left: 10px;
+  }
+
+  .hypothesis-label {
+    flex: 1 1 auto;
+    font-weight: bold;
+  }
+
+  /* Suppression du style pour le slider */
+  /* .slider-percentage {
+    width: 100px; 
+  } */
+
+  .delete-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .delete-button:hover {
+    background-color: #c0392b;
+  }
+
+  .lock-checkbox {
+    margin-left: 10px;
+  }
+
+  /**********************************************/
+  /*         BARRE DE POURCENTAGE VERTICALE     */
+  /**********************************************/
+
+  #percentage-bar-vertical {
+    width: 60px;
+    height: 300px;
+    border: 1px solid #000;
+    display: flex;
+    flex-direction: column; /* Ordre décroissant */
+    overflow: hidden;
+    position: relative;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    transition: all 0.5s ease-in-out;
+    z-index: 2;
+  }
+
+  #bar-segments {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column; /* Ordre décroissant */
+    transition: all 0.5s ease-in-out;
+  }
+
+  .segment {
+    width: 100%;
+    transition: height 0.5s ease-in-out, background-color 0.5s ease-in-out;
+    animation: fadeIn 0.5s ease-in-out;
+    position: relative;
+  }
+
+  .segment::after {
+    content: attr(title);
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 10px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .segment:hover::after {
+    opacity: 1;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /**********************************************/
+  /*                  SVG LINES                 */
+  /**********************************************/
+
+  #connections-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /**********************************************/
+  /*                  RESPONSIVE                */
+  /**********************************************/
+
+  @media (max-width: 768px) {
     #hypotheses-container {
-        display: flex;
-        gap: 20px;
-        justify-content: space-between;
-        align-items: flex-end;
-        flex-wrap: wrap; /* Permettre le retour à la ligne sur petits écrans */
-        position: relative; /* Pour positionner le SVG absolument */
+      flex-direction: column;
+      align-items: center;
     }
-
-    #connections-svg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none; /* Permettre les interactions avec les éléments sous le SVG */
-        z-index: 1; /* Positionner derrière les éléments */
-    }
-
-    #hypotheses-list {
-        flex: 1 1 400px;
-        max-width: 600px;
-        display: flex;
-        flex-direction: column-reverse; /* Inverser l'ordre pour aligner avec la barre */
-        position: relative;
-        z-index: 2; /* Positionner au-dessus du SVG */
-    }
-
-    .hypothesis-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-left: 10px solid #000;
-        border-radius: 5px;
-        background-color: #fff;
-        transition: background-color 0.3s;
-        animation: fadeIn 0.5s ease-in-out;
-        position: relative;
-        z-index: 2; /* Positionner au-dessus du SVG */
-    }
-
-    .hypothesis-item:hover {
-        background-color: #f9f9f9;
-    }
-
-    .hypothesis-color {
-        width: 15px;
-        height: 15px;
-        border-radius: 50%;
-        margin-right: 10px;
-    }
-
-    .hypothesis-details {
-        flex: 1;
-        display: flex;
-        align-items: center;
-    }
-
-    .hypothesis-details span {
-        margin-right: 10px;
-        flex: 1;
-    }
-
-    .hypothesis-details input[type="number"] {
-        width: 80px;
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        margin-right: 10px;
-    }
-
-    .delete-button {
-        background-color: #e74c3c;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 3px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .delete-button:hover {
-        background-color: #c0392b;
-    }
-
     #percentage-bar-vertical {
-        width: 60px;
-        height: 300px;
-        border: 1px solid #000;
-        display: flex;
-        flex-direction: column-reverse; /* Pour que le plus grand soit en bas */
-        overflow: hidden;
-        position: relative;
-        background-color: #f0f0f0;
-        border-radius: 5px;
-        transition: all 0.5s ease-in-out;
-        z-index: 2; /* Positionner au-dessus du SVG */
+      width: 80%;
+      height: 200px;
+      margin-top: 1rem;
     }
-
-    #bar-segments {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column-reverse; /* Assurer que le premier segment est en bas */
-        transition: all 0.5s ease-in-out;
+    #hypotheses-list {
+      max-width: 100%;
     }
-
-    .segment {
-        width: 100%;
-        transition: height 0.5s ease-in-out, background-color 0.5s ease-in-out;
-        animation: fadeIn 0.5s ease-in-out;
-        position: relative;
-    }
-
-    .segment::after {
-        content: attr(title);
-        position: absolute;
-        left: 50%;
-        bottom: 0;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.7);
-        color: #fff;
-        padding: 2px 5px;
-        border-radius: 3px;
-        font-size: 10px;
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-
-    .segment:hover::after {
-        opacity: 1;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Media Queries pour Responsivité */
-    @media (max-width: 768px) {
-        #hypotheses-container {
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #percentage-bar-vertical {
-            width: 80%;
-            height: 200px;
-        }
-
-        #hypotheses-list {
-            max-width: 100%;
-        }
-    }
+  }
 </style>
 
-<!-- Scripts JavaScript spécifiques à l'outil -->
+<div id="hypothesis-tool">
+  <h2>Outil de Gestion des Hypothèses</h2>
+
+  <!-- Titre de la question (changé dynamiquement) -->
+  <h3 id="question-subtitle" class="hidden"></h3>
+
+  <!-- FORMULAIRE POUR LA QUESTION -->
+  <div class="row">
+    <input type="text" id="question-input" placeholder="Entrez une question" style="flex:1 1 300px;">
+    <button id="set-question-button" class="btn">Définir la Question</button>
+  </div>
+
+  <!-- FORMULAIRE POUR AJOUTER UNE HYPOTHÈSE -->
+  <div class="row">
+    <input type="text" id="hypothesis-input" placeholder="Entrez une hypothèse" style="flex:2 1 300px;">
+    <input type="number" id="percentage-input" placeholder="Pourcentage (optionnel)" min="0" max="100" step="1" style="width:130px;">
+
+<!-- Sélection d'une couleur + bouton "Aléatoire" -->
+<label for="color-input">Couleur :</label>
+<input type="color" id="color-input" value="#FF5733" title="Choisir une couleur" />
+<button id="random-color-button" class="btn" title="Couleur aléatoire">🎨</button>
+
+<button id="add-button" class="btn">Ajouter</button>
+  </div>
+
+  <!-- Conteneur principal : liste + barre + SVG -->
+  <div id="hypotheses-container">
+    <svg id="connections-svg"></svg>
+    <div id="hypotheses-list"></div>
+    <div id="percentage-bar-vertical">
+      <div id="bar-segments"></div>
+    </div>
+  </div>
+</div>
+
 <script>
-    // ---------------------------------------------
-    // Gestion des hypothèses
-    // ---------------------------------------------
-    let hypotheses = [];
-    const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A8', '#33FFF5'];
+  /**************************************************/
+  /*               ÉTAT GLOBAL & CONFIG             */
+  /**************************************************/
 
-    // Éléments du DOM
-    const addButton = document.getElementById('add-button');
-    const setQuestionButton = document.getElementById('set-question-button');
-    const questionInput = document.getElementById('question-input');
-    const questionSubtitle = document.getElementById('question-subtitle');
-    const connectionsSvg = document.getElementById('connections-svg');
+  let hypotheses = [];  // Tableau d'objets : { hypothesis, percentage, color, locked }
+  const defaultColors = [
+    '#FF5733','#33FF57','#3357FF','#F333FF','#FF33A8',
+    '#33FFF5','#FFC300','#DAF7A6'
+  ];
 
-    addButton.addEventListener('click', addHypothesis);
-    setQuestionButton.addEventListener('click', setQuestion);
+  // Récupération des éléments du DOM
+  const questionInput = document.getElementById('question-input');
+  const questionSubtitle = document.getElementById('question-subtitle');
+  const setQuestionButton = document.getElementById('set-question-button');
 
-    // Charger les hypothèses sauvegardées et la question au démarrage
-    window.onload = loadHypotheses;
+  const hypothesisInput = document.getElementById('hypothesis-input');
+  const percentageInput = document.getElementById('percentage-input');
+  const colorInput = document.getElementById('color-input');
+  const randomColorButton = document.getElementById('random-color-button');
+  const addButton = document.getElementById('add-button');
 
-    // ---------------------------------------------
-    // Fonctions principales
-    // ---------------------------------------------
+  const connectionsSvg = document.getElementById('connections-svg');
 
-    function addHypothesis() {
-        const hypothesisInput = document.getElementById('hypothesis-input');
-        const percentageInput = document.getElementById('percentage-input');
-        const hypothesis = hypothesisInput.value.trim();
-        let percentage = parseFloat(percentageInput.value);
+  /**************************************************/
+  /*                   INIT                         */
+  /**************************************************/
+  window.addEventListener('DOMContentLoaded', () => {
+    loadStateFromLocalStorage();
+    renderAll();
+  });
 
-        if (!hypothesis) {
-            alert("Veuillez entrer une hypothèse valide.");
-            return;
+  /**************************************************/
+  /*                  ÉVÉNEMENTS                    */
+  /**************************************************/
+  setQuestionButton.addEventListener('click', handleQuestion);
+  addButton.addEventListener('click', handleAddHypothesis);
+  randomColorButton.addEventListener('click', handleRandomColor);
+
+  /**************************************************/
+  /*               FONCTIONS HANDLERS              */
+  /**************************************************/
+
+  function handleQuestion() {
+    if (setQuestionButton.textContent === "Définir une nouvelle question") {
+      const confirmReset = confirm(
+        "Voulez-vous réinitialiser toutes les hypothèses et définir une nouvelle question ?"
+      );
+      if (confirmReset) {
+        clearAllHypotheses();
+      } else {
+        return;
+      }
+    }
+    defineNewQuestion();
+  }
+
+  function defineNewQuestion() {
+    const question = questionInput.value.trim();
+    if (!question) {
+      alert("Veuillez entrer une question valide.");
+      return;
+    }
+    questionSubtitle.textContent = question;
+    questionSubtitle.classList.remove('hidden');
+    localStorage.setItem('question', question);
+
+    setQuestionButton.textContent = "Définir une nouvelle question";
+    questionInput.value = '';
+  }
+
+  function handleRandomColor() {
+    const randomIndex = Math.floor(Math.random() * defaultColors.length);
+    colorInput.value = defaultColors[randomIndex];
+  }
+
+  /**
+   * Ajoute une nouvelle hypothèse
+   * - Si l'utilisateur fournit un pourcentage p > 0, 
+   *   on réserve p% pour la nouvelle hypothèse, et on rééchelonne les existantes pour totaliser 100%.
+   * - Si l'utilisateur ne fournit aucun pourcentage (ou 0),
+   *   on répartit équitablement 100% sur toutes les hypothèses (anciennes + nouvelle).
+   */
+  function handleAddHypothesis() {
+    const hypothesisText = hypothesisInput.value.trim();
+    let rawPct = percentageInput.value.trim();
+    let chosenColor = colorInput.value.trim();
+
+    if (!hypothesisText) {
+      alert("Veuillez entrer une hypothèse valide.");
+      return;
+    }
+
+    // Couleur : si vide, on prend une couleur aléatoire
+    if (!chosenColor) {
+      const randomIndex = Math.floor(Math.random() * defaultColors.length);
+      chosenColor = defaultColors[randomIndex];
+    }
+
+    // Crée l'objet avec 'locked' initialisé à false
+    const newHypothesis = {
+      hypothesis: hypothesisText,
+      percentage: 0,
+      color: chosenColor,
+      locked: false
+    };
+
+    // Ajoute au tableau
+    hypotheses.push(newHypothesis);
+
+    // Gère la répartition
+    if (rawPct === "") {
+      // Pas de pourcentage fourni => distribution équitable
+      distributeEqually();
+    } else {
+      // L'utilisateur veut un certain pourcentage
+      let p = parseInt(rawPct, 10);
+      if (isNaN(p) || p < 0 || p > 100) {
+        alert("Veuillez entrer un pourcentage valide entre 0 et 100 (ou laissez vide).");
+        // On retire l'hypothèse qu'on vient d'ajouter
+        hypotheses.pop();
+        return;
+      }
+      if (p === 0) {
+        // Si l'utilisateur a explicitement saisi 0
+        distributeEqually();
+      } else {
+        // L'utilisateur a un pourcentage > 0
+        // 1. On réserve p% pour la nouvelle hypothèse
+        newHypothesis.percentage = p;
+
+        // 2. Vérifier que les hypothèses verrouillées ne dépassent pas 100%
+        const totalLocked = getTotalLockedPercentage();
+        if (totalLocked + p > 100) {
+          alert("Le total des pourcentages verrouillés dépasse 100%. Veuillez ajuster les pourcentages.");
+          hypotheses.pop();
+          return;
         }
 
-        if (hypotheses.length === 0) {
-            // Première hypothèse, elle occupe automatiquement 100%
-            percentage = 100;
-            hypotheses.push({ hypothesis, percentage, color: colors[hypotheses.length % colors.length] });
-        } else {
-            if (isNaN(percentage) || percentage < 0 || percentage > 100) {
-                alert("Veuillez entrer un pourcentage valide entre 0 et 100.");
-                return;
-            }
+        // 3. On rééchelonne les hypothèses non verrouillées pour qu'elles se partagent (100 - p)
+        redistributeAfterAddition(p);
+      }
+    }
 
-            // Vérifier si l'ajout dépasse 100%
-            const desiredTotal = getTotalPercentage() + percentage;
-            if (desiredTotal > 100) {
-                const excess = desiredTotal - 100;
-                // Réduire toutes les hypothèses existantes proportionnellement
-                const adjustableHypotheses = hypotheses.filter(h => h.percentage > 0);
-                const totalAdjustable = adjustableHypotheses.reduce((sum, h) => sum + h.percentage, 0);
-                if (totalAdjustable === 0) {
-                    alert("Impossible d'ajouter cette hypothèse car il n'y a pas d'hypothèses ajustables.");
-                    return;
-                }
-                adjustableHypotheses.forEach(h => {
-                    h.percentage -= (h.percentage / totalAdjustable) * excess;
-                    h.percentage = Math.max(0, h.percentage);
-                });
-            }
+    saveStateToLocalStorage();
+    renderAll();
 
-            // Ajouter la nouvelle hypothèse
-            const color = colors[hypotheses.length % colors.length];
-            hypotheses.push({ hypothesis, percentage, color });
+    // Reset champs
+    hypothesisInput.value = '';
+    percentageInput.value = '';
+  }
+
+  /**************************************************/
+  /*        FONCTIONS : RÉPARTITION / AJUSTEMENT    */
+  /**************************************************/
+
+  /**
+   * Distribution équitable de 100% sur toutes les hypothèses non verrouillées
+   */
+  function distributeEqually() {
+    const unlocked = hypotheses.filter(h => !h.locked);
+    const n = unlocked.length;
+    if (n === 0) {
+      // Si aucune hypothèse non verrouillée, répartir tout sur les verrouillées
+      return;
+    }
+    const share = Math.floor(100 / n);
+    let sum = share * n;
+    let remainder = 100 - sum;
+
+    // Assigne
+    unlocked.forEach(h => h.percentage = share);
+
+    // Distribue le remainder
+    for (let i = 0; i < unlocked.length && remainder > 0; i++) {
+      unlocked[i].percentage++;
+      remainder--;
+    }
+  }
+
+  /**
+   * Rééchelonne les hypothèses déjà présentes quand on a réservé p% pour la nouvelle hypothèse
+   * => Les autres se partagent 100 - p proportionnellement à leur poids actuel
+   */
+  function redistributeAfterAddition(newPct) {
+    const leftover = 100 - newPct;      // ce qu'il reste pour les autres
+    if (leftover < 0) return;          // on a déjà alerté, ne devrait pas arriver
+
+    const unlocked = hypotheses.filter(h => !h.locked);
+    const sumOldHypotheses = unlocked.reduce((sum, h) => sum + h.percentage, 0);
+
+    if (sumOldHypotheses === 0) {
+      // Si aucune hypothèse non verrouillée, distribuer équitablement le leftover
+      distributeEqually();
+      return;
+    }
+
+    // Redistribuer proportionnellement
+    unlocked.forEach(h => {
+      h.percentage = Math.floor((h.percentage / sumOldHypotheses) * leftover);
+    });
+
+    // Corriger les éventuels écarts dus aux arrondis
+    let sumAfter = unlocked.reduce((sum, h) => sum + h.percentage, 0);
+    let diff = leftover - sumAfter;
+    for (let i = 0; i < unlocked.length && diff > 0; i++) {
+      unlocked[i].percentage++;
+      diff--;
+    }
+  }
+
+  /**
+   * Quand on modifie un pourcentage existant via l'input number, 
+   * on force à 100% en ajustant les hypothèses non verrouillées.
+   */
+  function handlePercentageChange(index, newValue) {
+    if (isNaN(newValue) || newValue < 0 || newValue > 100) {
+      alert("Veuillez entrer un pourcentage valide entre 0 et 100.");
+      renderAll();
+      return;
+    }
+
+    const oldValue = hypotheses[index].percentage;
+    const delta = newValue - oldValue;
+    hypotheses[index].percentage = newValue;
+
+    let totalLocked = getTotalLockedPercentage();
+    if (totalLocked > 100) {
+      alert("Le total des pourcentages verrouillés dépasse 100%. Veuillez ajuster les pourcentages.");
+      hypotheses[index].percentage = oldValue;
+      return;
+    }
+
+    let total = getTotalPercentage();
+    if (total > 100) {
+      const diff = total - 100;
+      adjustUnlockedPercentages(-diff, index);
+    } else if (total < 100) {
+      const diff = 100 - total;
+      adjustUnlockedPercentages(diff, index);
+    }
+    saveStateToLocalStorage();
+    renderAll();
+  }
+
+  /**
+   * Ajuste les pourcentages des hypothèses non verrouillées
+   * @param {number} diff - La différence à ajuster (positive ou négative)
+   * @param {number} excludeIndex - L'index à exclure de l'ajustement
+   */
+  function adjustUnlockedPercentages(diff, excludeIndex) {
+    const unlocked = hypotheses.filter((h, idx) => !h.locked && idx !== excludeIndex);
+    const n = unlocked.length;
+    if (n === 0) return;
+
+    if (diff < 0) {
+      // Réduire les pourcentages
+      const reduction = Math.abs(diff);
+      const share = Math.floor(reduction / n);
+      let remainder = reduction - (share * n);
+      unlocked.forEach(h => h.percentage = Math.max(0, h.percentage - share));
+      for (let i = 0; i < unlocked.length && remainder > 0; i++) {
+        if (unlocked[i].percentage > 0) {
+          unlocked[i].percentage--;
+          remainder--;
         }
+      }
+    } else {
+      // Augmenter les pourcentages
+      const addition = diff;
+      const share = Math.floor(addition / n);
+      let remainder = addition - (share * n);
+      unlocked.forEach(h => h.percentage += share);
+      for (let i = 0; i < unlocked.length && remainder > 0; i++) {
+        unlocked[i].percentage++;
+        remainder--;
+      }
+    }
+  }
 
-        adjustPercentages();
-        sortHypotheses();
-        renderHypotheses();
-        renderBar();
-        drawConnections();
-        saveHypotheses();
+  /**************************************************/
+  /*        FONCTIONS : SAUVEGARDE / RESTAURATION   */
+  /**************************************************/
 
-        hypothesisInput.value = '';
-        percentageInput.value = '';
+  function saveStateToLocalStorage() {
+    localStorage.setItem('hypotheses', JSON.stringify(hypotheses));
+  }
+
+  function loadStateFromLocalStorage() {
+    // Hypothèses
+    const stored = localStorage.getItem('hypotheses');
+    if (stored) {
+      hypotheses = JSON.parse(stored);
     }
 
-    function setQuestion() {
-        // Si on appuie sur le bouton alors qu'on a déjà une question, on demande de confirmer
-        if (setQuestionButton.textContent === "Définir une nouvelle question") {
-            const confirmReset = confirm("Voulez-vous réinitialiser toutes les hypothèses et définir une nouvelle question ?");
-            if (confirmReset) {
-                clearAllHypotheses();
-            } else {
-                return; // Annuler l'action si l'utilisateur ne souhaite pas réinitialiser
-            }
+    // Question
+    const storedQuestion = localStorage.getItem('question');
+    if (storedQuestion) {
+      questionSubtitle.textContent = storedQuestion;
+      questionSubtitle.classList.remove('hidden');
+      setQuestionButton.textContent = "Définir une nouvelle question";
+    }
+  }
+
+  function clearAllHypotheses() {
+    hypotheses = [];
+    localStorage.removeItem('hypotheses');
+    renderAll();
+  }
+
+  /**************************************************/
+  /*         FONCTIONS : RENDER / AFFICHAGE         */
+  /**************************************************/
+
+  function renderAll() {
+    sortHypotheses();
+    renderHypothesesList();
+    renderBar();
+    drawConnections();
+  }
+
+  function sortHypotheses() {
+    // Tri décroissant par pourcentage
+    hypotheses.sort((a, b) => b.percentage - a.percentage);
+  }
+
+  function renderHypothesesList() {
+    const list = document.getElementById('hypotheses-list');
+    list.innerHTML = '';
+
+    hypotheses.forEach((h, index) => {
+      const item = document.createElement('div');
+      item.className = 'hypothesis-item';
+      item.style.borderLeftColor = h.color;
+
+      const details = document.createElement('div');
+      details.className = 'hypothesis-details';
+
+      // Label
+      const label = document.createElement('span');
+      label.className = 'hypothesis-label';
+      label.textContent = h.hypothesis;
+
+      // Input number
+      const inputNumber = document.createElement('input');
+      inputNumber.type = 'number';
+      inputNumber.min = 0;
+      inputNumber.max = 100;
+      inputNumber.step = 1;
+      inputNumber.value = h.percentage;
+      inputNumber.title = "Modifier le pourcentage";
+
+      // Couleur
+      const colorPicker = document.createElement('input');
+      colorPicker.type = 'color';
+      colorPicker.value = h.color;
+      colorPicker.title = "Changer la couleur";
+
+      // Case à cocher pour verrouiller
+      const lockCheckbox = document.createElement('input');
+      lockCheckbox.type = 'checkbox';
+      lockCheckbox.checked = h.locked;
+      lockCheckbox.className = 'lock-checkbox';
+      lockCheckbox.title = "Verrouiller le pourcentage";
+
+      const lockLabel = document.createElement('label');
+      lockLabel.textContent = "Verrouiller";
+      lockLabel.style.marginLeft = '5px';
+
+      // Bouton supprimer
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-button';
+      deleteBtn.textContent = 'Supprimer';
+
+      // Écouteurs
+      inputNumber.addEventListener('change', (e) => {
+        handlePercentageChange(index, parseInt(e.target.value));
+      });
+      colorPicker.addEventListener('input', (e) => {
+        h.color = e.target.value;
+        saveStateToLocalStorage();
+        renderAll();
+      });
+      deleteBtn.addEventListener('click', () => handleDeleteHypothesis(index));
+      lockCheckbox.addEventListener('change', (e) => {
+        handleLockChange(index, e.target.checked);
+      });
+
+      // Construction
+      details.appendChild(label);
+      details.appendChild(inputNumber);
+      details.appendChild(colorPicker);
+      details.appendChild(lockCheckbox);
+      details.appendChild(lockLabel);
+      details.appendChild(deleteBtn);
+
+      item.appendChild(details);
+      list.appendChild(item);
+    });
+  }
+
+  function handleDeleteHypothesis(index) {
+    const removedPct = hypotheses[index].percentage;
+    hypotheses.splice(index, 1);
+
+    if (hypotheses.length === 0) {
+      // Plus rien
+      saveStateToLocalStorage();
+      renderAll();
+      return;
+    }
+
+    // On réintroduit ce pourcentage dans les hypothèses non verrouillées
+    adjustUnlockedPercentages(removedPct, null);
+    forceTotalTo100();
+
+    saveStateToLocalStorage();
+    renderAll();
+  }
+
+  /**
+   * Gère le changement de verrouillage d'une hypothèse
+   * @param {number} index - Index de l'hypothèse
+   * @param {boolean} isLocked - État du verrouillage
+   */
+  function handleLockChange(index, isLocked) {
+    if (isLocked) {
+      const totalLocked = getTotalLockedPercentage() + hypotheses[index].percentage;
+      if (totalLocked > 100) {
+        alert("Le total des pourcentages verrouillés dépasse 100%. Veuillez ajuster les pourcentages.");
+        // Revenir à l'état précédent
+        hypotheses[index].locked = false;
+        renderAll();
+        return;
+      }
+      hypotheses[index].locked = true;
+    } else {
+      hypotheses[index].locked = false;
+    }
+    redistributeAfterLockChange();
+    saveStateToLocalStorage();
+    renderAll();
+  }
+
+  /**
+   * Redistribue les pourcentages après un changement de verrouillage
+   */
+  function redistributeAfterLockChange() {
+    const totalLocked = getTotalLockedPercentage();
+    if (totalLocked > 100) {
+      alert("Le total des pourcentages verrouillés dépasse 100%. Veuillez ajuster les pourcentages.");
+      return;
+    }
+
+    const leftover = 100 - totalLocked;
+    const unlocked = hypotheses.filter(h => !h.locked);
+    const n = unlocked.length;
+
+    if (n > 0) {
+      const share = Math.floor(leftover / n);
+      let sum = share * n;
+      let remainder = leftover - sum;
+
+      unlocked.forEach(h => h.percentage = share);
+
+      for (let i = 0; i < n && remainder > 0; i++) {
+        unlocked[i].percentage++;
+        remainder--;
+      }
+    }
+  }
+
+  /**
+   * Force le total des pourcentages à 100%
+   */
+  function forceTotalTo100() {
+    let total = getTotalPercentage();
+    if (total === 0 && hypotheses.length > 0) {
+      // Tout à 0 => répartir équitablement
+      distributeEqually();
+      return;
+    }
+    if (total === 100) return;
+
+    if (total > 100) {
+      const diff = total - 100;
+      adjustUnlockedPercentages(-diff, null);
+    } else if (total < 100) {
+      const diff = 100 - total;
+      adjustUnlockedPercentages(diff, null);
+    }
+  }
+
+  /**
+   * Répartit la différence parmi les hypothèses non verrouillées
+   * @param {number} diff - Différence à ajuster (positive ou négative)
+   * @param {number|null} excludeIndex - Index à exclure de l'ajustement
+   */
+  function adjustUnlockedPercentages(diff, excludeIndex) {
+    const unlocked = hypotheses.filter((h, idx) => !h.locked && idx !== excludeIndex);
+    const n = unlocked.length;
+    if (n === 0) return;
+
+    if (diff < 0) {
+      // Réduire les pourcentages
+      const reduction = Math.abs(diff);
+      const share = Math.floor(reduction / n);
+      let remainder = reduction - (share * n);
+      unlocked.forEach(h => h.percentage = Math.max(0, h.percentage - share));
+      for (let i = 0; i < unlocked.length && remainder > 0; i++) {
+        if (unlocked[i].percentage > 0) {
+          unlocked[i].percentage--;
+          remainder--;
         }
-        defineNewQuestion();
+      }
+    } else {
+      // Augmenter les pourcentages
+      const addition = diff;
+      const share = Math.floor(addition / n);
+      let remainder = addition - (share * n);
+      unlocked.forEach(h => h.percentage += share);
+      for (let i = 0; i < unlocked.length && remainder > 0; i++) {
+        unlocked[i].percentage++;
+        remainder--;
+      }
     }
+  }
 
-    function defineNewQuestion() {
-        const question = questionInput.value.trim();
-        if (!question) {
-            alert("Veuillez entrer une question valide.");
-            return;
-        }
-        setQuestionDisplay(question);
-        saveQuestion(question);
-        setQuestionButton.textContent = "Définir une nouvelle question"; 
-        questionInput.value = '';
-    }
+  /**
+   * Retourne le total des pourcentages verrouillés
+   */
+  function getTotalLockedPercentage() {
+    return hypotheses.reduce((sum, h) => sum + (h.locked ? h.percentage : 0), 0);
+  }
 
-    // Vider toutes les hypothèses (et localStorage) 
-    function clearAllHypotheses() {
-        hypotheses = [];
-        localStorage.removeItem('hypotheses');
-        renderHypotheses();
-        renderBar();
-        drawConnections();
-    }
+  function getTotalPercentage() {
+    return hypotheses.reduce((sum, h) => sum + h.percentage, 0);
+  }
 
-    // ---------------------------------------------
-    // Fonctions utilitaires
-    // ---------------------------------------------
-    function adjustPercentages() {
-        // Assurer que le total des pourcentages est toujours à 100%
-        let total = getTotalPercentage();
-        if (total !== 100 && hypotheses.length > 0) {
-            const difference = 100 - total;
-            // Répartir la différence proportionnellement parmi toutes les hypothèses
-            const adjustableHypotheses = hypotheses.filter(h => h.percentage > 0);
-            const totalAdjustable = adjustableHypotheses.reduce((sum, h) => sum + h.percentage, 0);
-            if (totalAdjustable > 0) {
-                adjustableHypotheses.forEach(h => {
-                    h.percentage += (h.percentage / totalAdjustable) * difference;
-                    h.percentage = Math.max(0, h.percentage);
-                });
-            }
-        }
-    }
+  function renderBar() {
+    const bar = document.getElementById('bar-segments');
+    bar.innerHTML = '';
 
-    function sortHypotheses() {
-        // Trier les hypothèses en ordre décroissant de pourcentage
-        hypotheses.sort((a, b) => b.percentage - a.percentage);
-    }
+    hypotheses.forEach(h => {
+      const segment = document.createElement('div');
+      segment.className = 'segment';
+      segment.style.height = h.percentage + '%';
+      segment.style.backgroundColor = h.color;
+      segment.title = `${h.hypothesis}: ${h.percentage}%`;
+      bar.appendChild(segment);
+    });
+  }
 
-    function getTotalPercentage() {
-        return hypotheses.reduce((sum, h) => sum + h.percentage, 0);
-    }
+  function drawConnections() {
+    const container = document.getElementById('hypotheses-container');
+    const containerRect = container.getBoundingClientRect();
+    const list = document.getElementById('hypotheses-list');
+    const listItems = list.getElementsByClassName('hypothesis-item');
+    const bar = document.getElementById('percentage-bar-vertical');
+    const segments = bar.getElementsByClassName('segment');
+    const svg = document.getElementById('connections-svg');
 
-    function renderHypotheses() {
-        const list = document.getElementById('hypotheses-list');
-        list.innerHTML = '';
+    svg.innerHTML = '';
 
-        // Les hypothèses sont déjà triées en ordre décroissant
-        hypotheses.forEach((h, index) => {
-            const item = document.createElement('div');
-            item.className = 'hypothesis-item';
-            item.style.borderLeftColor = h.color;
+    hypotheses.forEach((h, index) => {
+      // L’item DOM correspondant
+      const item = listItems[index];
+      const segment = segments[index];
 
-            const colorIndicator = document.createElement('div');
-            colorIndicator.className = 'hypothesis-color';
-            colorIndicator.style.backgroundColor = h.color;
+      if (item && segment) {
+        const itemRect = item.getBoundingClientRect();
+        const segmentRect = segment.getBoundingClientRect();
 
-            const details = document.createElement('div');
-            details.className = 'hypothesis-details';
+        const x1 = itemRect.right - containerRect.left;
+        const y1 = itemRect.top - containerRect.top + (itemRect.height / 2);
 
-            const label = document.createElement('span');
-            label.textContent = h.hypothesis;
+        const x2 = segmentRect.left - containerRect.left + (segmentRect.width / 2);
+        const y2 = segmentRect.top - containerRect.top + (segmentRect.height / 2);
 
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.value = h.percentage.toFixed(2);
-            input.min = 0;
-            input.max = 100;
-            input.step = 0.01;
-            // Désactiver la modification si c'est la seule hypothèse
-            input.disabled = (hypotheses.length === 1); 
-            input.title = (hypotheses.length === 1) 
-                ? "La première hypothèse est toujours à 100%" 
-                : "Modifier le pourcentage";
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        line.setAttribute('stroke', h.color);
+        line.setAttribute('stroke-width', '1');
 
-            input.addEventListener('change', (e) => {
-                if (hypotheses.length === 1) return; // Ne pas modifier si c'est la seule
-                updatePercentage(index, parseFloat(e.target.value));
-            });
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-button';
-            deleteBtn.textContent = 'Supprimer';
-            deleteBtn.addEventListener('click', () => deleteHypothesis(index));
-
-            details.appendChild(label);
-            details.appendChild(input);
-            details.appendChild(deleteBtn);
-
-            item.appendChild(colorIndicator);
-            item.appendChild(details);
-            list.appendChild(item);
-        });
-    }
-
-    function updatePercentage(index, newPercentage) {
-        if (isNaN(newPercentage) || newPercentage < 0 || newPercentage > 100) {
-            alert("Veuillez entrer un pourcentage valide entre 0 et 100.");
-            renderHypotheses();
-            return;
-        }
-
-        hypotheses[index].percentage = newPercentage;
-
-        adjustPercentages();
-        sortHypotheses();
-        renderHypotheses();
-        renderBar();
-        drawConnections();
-        saveHypotheses();
-    }
-
-    function deleteHypothesis(index) {
-        // Permettre la suppression de la première hypothèse seulement si c'est la seule
-        if (index === 0 && hypotheses.length > 1) {
-            alert("La première hypothèse ne peut pas être supprimée tant qu'il y a d'autres hypothèses.");
-            return;
-        }
-
-        hypotheses.splice(index, 1);
-        adjustPercentages();
-        sortHypotheses();
-        renderHypotheses();
-        renderBar();
-        drawConnections();
-        saveHypotheses();
-    }
-
-    function renderBar() {
-        const bar = document.getElementById('bar-segments');
-        bar.innerHTML = '';
-
-        // Les hypothèses sont déjà triées en ordre décroissant
-        hypotheses.forEach(h => {
-            const segment = document.createElement('div');
-            segment.className = 'segment';
-            segment.style.height = `${h.percentage}%`;
-            segment.style.backgroundColor = h.color;
-            segment.title = `${h.hypothesis}: ${h.percentage.toFixed(2)}%`;
-            bar.appendChild(segment);
-        });
-    }
-
-    function drawConnections() {
-        // Effacer les connexions existantes
-        connectionsSvg.innerHTML = '';
-
-        const container = document.getElementById('hypotheses-container');
-        const containerRect = container.getBoundingClientRect();
-
-        const list = document.getElementById('hypotheses-list');
-        const listItems = list.getElementsByClassName('hypothesis-item');
-
-        const bar = document.getElementById('percentage-bar-vertical');
-        const segments = bar.getElementsByClassName('segment');
-
-        hypotheses.forEach((h, index) => {
-            const item = listItems[index];
-            const segment = segments[index];
-            if (item && segment) {
-                const itemRect = item.getBoundingClientRect();
-                const segmentRect = segment.getBoundingClientRect();
-
-                // Calculer la position relative au conteneur
-                const x1 = itemRect.right - containerRect.left;
-                const y1 = itemRect.top - containerRect.top + (itemRect.height / 2);
-                const x2 = segmentRect.left - containerRect.left + (segmentRect.width / 2);
-                const y2 = segmentRect.top - containerRect.top + (segmentRect.height / 2);
-
-                // Créer une ligne SVG avec la couleur de l'hypothèse
-                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                line.setAttribute('x1', x1);
-                line.setAttribute('y1', y1);
-                line.setAttribute('x2', x2);
-                line.setAttribute('y2', y2);
-                line.setAttribute('stroke', h.color); // Couleur de l'hypothèse
-                line.setAttribute('stroke-width', '1');
-
-                connectionsSvg.appendChild(line);
-            }
-        });
-    }
-
-    // ---------------------------------------------
-    // Gestion du LocalStorage
-    // ---------------------------------------------
-
-    function saveHypotheses() {
-        localStorage.setItem('hypotheses', JSON.stringify(hypotheses));
-    }
-
-    function loadHypotheses() {
-        const stored = localStorage.getItem('hypotheses');
-        if (stored) {
-            hypotheses = JSON.parse(stored);
-            adjustPercentages();
-            sortHypotheses();
-            renderHypotheses();
-            renderBar();
-            drawConnections();
-        }
-
-        // Charger la question si elle existe
-        const storedQuestion = localStorage.getItem('question');
-        if (storedQuestion) {
-            setQuestionDisplay(storedQuestion);
-            setQuestionButton.textContent = "Définir une nouvelle question";
-        }
-    }
-
-    function setQuestionDisplay(question) {
-        questionSubtitle.textContent = question;
-        questionSubtitle.classList.remove('hidden');
-    }
-
-    function saveQuestion(question) {
-        localStorage.setItem('question', question);
-    }
+        svg.appendChild(line);
+      }
+    });
+  }
 </script>

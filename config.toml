@@ -1,5 +1,6 @@
 baseURL = "/"
 languageCode = "fr-ca"
+defaultContentLanguage = "fr"
 title = "Blogue de Jordan Chénard"
 themesDir = "themes"
 theme = "hugo-winston-theme"
@@ -8,6 +9,11 @@ pygmentsCodeFences = true
 pygmentsCodefencesGuessSyntax = true
 pygmentsUseClasses = true
 paginate = 3
+
+[languages]
+  [languages.fr]
+    languageName = "Français"
+    weight = 1
 
 [module]
   [module.hugoVersion]
@@ -26,6 +32,9 @@ paginate = 3
   addDot = true
 
   highlightColor = '#7b16ff'
+
+  dateFormat = "02 janvier 2006"
+  
 
 [markup]
   [markup.goldmark]
